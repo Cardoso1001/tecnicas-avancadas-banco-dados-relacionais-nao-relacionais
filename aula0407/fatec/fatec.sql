@@ -1,0 +1,265 @@
+-- Criação do banco de dados
+-- create database fatec;
+
+
+-- create table professor(
+--  	rp int(5) primary key auto_increment,
+--  	nome varchar (50) not null,
+--   data_nasc date not null,
+--   cpf varchar(15) not null,
+--   email_pessoal varchar(50) not null,
+--   email_institucional varchar(50) not null,
+--   telefone varchar(15) not null,
+--   endereco varchar(100) not null,
+--   cidade varchar(30) not null
+--  );
+--  create table curso (
+--  	codcurso int(5) primary key auto_increment,
+--  	nome varchar(40) not null,
+--   carga_horaria int(5) not null,
+--   modalidade varchar(20) not null, -- presencial, semipresencial, EAD
+--   tipo_curso varchar(20) not null -- bacharelado, licenciatura, tecnólogo
+--  );
+--  create table disciplina(
+--  	coddisc int(5) primary key auto_increment,
+--  	nome varchar(50) not null,
+--   carga_horaria int(5) not null,
+--   codprof int(5),
+--   foreign key (codprof) references professor(rp)
+--  );
+--  create table item_disc_curso(
+--  	coditem int(5) primary key auto_increment,
+--  	coddisc int(5),
+--  	codcurso int(5),
+--   foreign key(coddisc) references disciplina(coddisc),
+--  	foreign key(codcurso) references curso(codcurso)
+--  );
+--  create table turma(
+--   codturma int(5) primary key auto_increment,
+--   nome varchar(30) null,
+--   semestre_atual int(2) not null,
+
+--   codcurso int(5),
+--   foreign key (codcurso) references curso(codcurso)
+--  );
+--  create TABLE aluno(
+--  	ra int(5) PRIMARY KEY auto_increment,
+--  	nome varchar(50) not null,
+--  	cpf varchar(15) not null,
+--   email_pessoal varchar(50) not null,
+--   email_institucional varchar(50) not null,
+--   telefone varchar(15) not null,
+--  	data_nasc date not null,
+--   endereco varchar(100) not null,
+--   cidade varchar(30) not null,
+--   codturma int(5),
+--   foreign key (codturma) references turma(codturma)
+--  );
+
+
+
+-- ================================================
+-- FATEC Ourinhos — Dados de Seed
+-- 5 cursos | 10 professores | 20 disciplinas
+-- 5 turmas (1 por curso) | 15 alunos por turma = 75 alunos
+-- ================================================
+
+-- USE fatec;
+
+-- -- ── LIMPAR DADOS ANTERIORES (ordem inversa de FK) ─────────
+-- SET FOREIGN_KEY_CHECKS = 0;
+
+-- DELETE FROM aluno;
+-- DELETE FROM item_disc_curso;
+-- DELETE FROM turma;
+-- DELETE FROM disciplina;
+-- DELETE FROM curso;
+-- DELETE FROM professor;
+
+-- -- Resetar AUTO_INCREMENT para garantir IDs a partir de 1
+-- ALTER TABLE aluno           AUTO_INCREMENT = 1;
+-- ALTER TABLE item_disc_curso AUTO_INCREMENT = 1;
+-- ALTER TABLE turma           AUTO_INCREMENT = 1;
+-- ALTER TABLE disciplina      AUTO_INCREMENT = 1;
+-- ALTER TABLE curso           AUTO_INCREMENT = 1;
+-- ALTER TABLE professor       AUTO_INCREMENT = 1;
+
+-- SET FOREIGN_KEY_CHECKS = 1;
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 1. PROFESSORES (10)
+-- -- ══════════════════════════════════════════════════════════
+-- INSERT INTO professor (nome, data_nasc, cpf, email_pessoal, email_institucional, telefone, endereco, cidade) VALUES
+-- ('Ricardo Alves Ferreira',      '1978-04-12', '321.654.987-01', 'ricardo.ferreira@gmail.com',   'ricardo.ferreira@fatec.sp.gov.br',   '(14) 99801-1001', 'Rua Marechal Deodoro, 45',      'Ourinhos'),
+-- ('Patrícia Mendonça Lima',      '1982-09-23', '456.789.123-02', 'patricia.lima@gmail.com',       'patricia.lima@fatec.sp.gov.br',       '(14) 99802-1002', 'Av. Getúlio Vargas, 230',       'Ourinhos'),
+-- ('Fábio Henrique Cardoso',      '1975-01-30', '789.123.456-03', 'fabio.cardoso@gmail.com',       'fabio.cardoso@fatec.sp.gov.br',       '(14) 99803-1003', 'Rua XV de Novembro, 88',        'Salto Grande'),
+-- ('Renata Oliveira Souza',       '1985-07-15', '147.258.369-04', 'renata.souza@gmail.com',        'renata.souza@fatec.sp.gov.br',        '(14) 99804-1004', 'Rua João Pessoa, 112',          'Ourinhos'),
+-- ('Marcelo Teixeira Braga',      '1979-11-02', '258.369.147-05', 'marcelo.braga@gmail.com',       'marcelo.braga@fatec.sp.gov.br',       '(14) 99805-1005', 'Rua Sete de Setembro, 67',      'Ribeirão do Sul'),
+-- ('Juliana Castro Pires',        '1988-03-18', '369.147.258-06', 'juliana.pires@gmail.com',       'juliana.pires@fatec.sp.gov.br',       '(14) 99806-1006', 'Rua Dom Pedro II, 310',         'Ourinhos'),
+-- ('Anderson Luís Moraes',        '1973-06-27', '741.852.963-07', 'anderson.moraes@gmail.com',     'anderson.moraes@fatec.sp.gov.br',     '(14) 99807-1007', 'Av. Brasil, 521',               'Chavantes'),
+-- ('Camila Rodrigues Neves',      '1990-12-05', '852.963.741-08', 'camila.neves@gmail.com',        'camila.neves@fatec.sp.gov.br',        '(14) 99808-1008', 'Rua Floriano Peixoto, 77',      'Ourinhos'),
+-- ('Leonardo Pinheiro Araújo',    '1983-08-19', '963.741.852-09', 'leonardo.araujo@gmail.com',     'leonardo.araujo@fatec.sp.gov.br',     '(14) 99809-1009', 'Rua Rui Barbosa, 200',          'Canitar'),
+-- ('Fernanda Batista Guimarães',  '1986-05-14', '159.357.486-10', 'fernanda.guimaraes@gmail.com',  'fernanda.guimaraes@fatec.sp.gov.br',  '(14) 99810-1010', 'Rua Tiradentes, 143',           'Ourinhos');
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 2. CURSOS (5) — reais da FATEC Ourinhos
+-- -- ══════════════════════════════════════════════════════════
+-- INSERT INTO curso (nome, carga_horaria, modalidade, tipo_curso) VALUES
+-- ('Análise e Desenvolvimento de Sistemas',  2400, 'Presencial',      'Tecnólogo'),   -- codcurso 1
+-- ('Gestão Empresarial',                     1600, 'Semipresencial',  'Tecnólogo'),   -- codcurso 2
+-- ('Logística',                              1600, 'Presencial',      'Tecnólogo'),   -- codcurso 3
+-- ('Agronegócio',                            1600, 'Presencial',      'Tecnólogo'),   -- codcurso 4
+-- ('Produção Sucroalcooleira',               2000, 'Presencial',      'Tecnólogo');   -- codcurso 5
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 3. DISCIPLINAS (20) — 4 por curso, distribuídas entre profs
+-- -- ══════════════════════════════════════════════════════════
+-- INSERT INTO disciplina (nome, carga_horaria, codprof) VALUES
+-- -- ADS (1–4)
+-- ('Algoritmos e Lógica de Programação',  80, 1),   -- coddisc 1
+-- ('Programação Orientada a Objetos',     80, 1),   -- coddisc 2
+-- ('Banco de Dados Relacional',           60, 2),   -- coddisc 3
+-- ('Engenharia de Software',              60, 2),   -- coddisc 4
+-- -- Gestão Empresarial (5–8)
+-- ('Fundamentos de Administração',        60, 3),   -- coddisc 5
+-- ('Contabilidade Geral',                 60, 3),   -- coddisc 6
+-- ('Gestão de Pessoas',                   40, 4),   -- coddisc 7
+-- ('Marketing Digital',                   40, 4),   -- coddisc 8
+-- -- Logística (9–12)
+-- ('Cadeia de Suprimentos',               60, 5),   -- coddisc 9
+-- ('Gestão de Estoques',                  60, 5),   -- coddisc 10
+-- ('Logística Internacional',             40, 6),   -- coddisc 11
+-- ('Transporte e Distribuição',           40, 6),   -- coddisc 12
+-- -- Agronegócio (13–16)
+-- ('Economia Rural',                      60, 7),   -- coddisc 13
+-- ('Administração Rural',                 60, 7),   -- coddisc 14
+-- ('Cooperativismo e Associativismo',     40, 8),   -- coddisc 15
+-- ('Mercado e Comercialização Agrícola',  40, 8),   -- coddisc 16
+-- -- Produção Sucroalcooleira (17–20)
+-- ('Tecnologia do Açúcar e Álcool',       80, 9),   -- coddisc 17
+-- ('Automação Industrial',                60, 9),   -- coddisc 18
+-- ('Controle de Qualidade Industrial',    60, 10),  -- coddisc 19
+-- ('Meio Ambiente e Sustentabilidade',    40, 10);  -- coddisc 20
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 4. VÍNCULOS DISCIPLINA ↔ CURSO
+-- -- ══════════════════════════════════════════════════════════
+-- INSERT INTO item_disc_curso (coddisc, codcurso) VALUES
+-- (1,1),(2,1),(3,1),(4,1),   -- ADS
+-- (5,2),(6,2),(7,2),(8,2),   -- Gestão
+-- (9,3),(10,3),(11,3),(12,3),-- Logística
+-- (13,4),(14,4),(15,4),(16,4),-- Agronegócio
+-- (17,5),(18,5),(19,5),(20,5);-- Sucroalcooleira
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 5. TURMAS (1 por curso)
+-- -- ══════════════════════════════════════════════════════════
+-- INSERT INTO turma (nome, codcurso) VALUES
+-- ('ADS 2025/1',    1),  -- codturma 1
+-- ('GE 2025/1',     2),  -- codturma 2
+-- ('LOG 2025/1',    3),  -- codturma 3
+-- ('AGR 2025/1',    4),  -- codturma 4
+-- ('PSA 2025/1',    5);  -- codturma 5
+
+-- -- ══════════════════════════════════════════════════════════
+-- -- 6. ALUNOS — 15 por turma = 75 total
+-- -- ══════════════════════════════════════════════════════════
+
+-- -- ── TURMA 1 — ADS ─────────────────────────────────────────
+-- INSERT INTO aluno (nome, cpf, email_pessoal, email_institucional, telefone, data_nasc, endereco, cidade, codturma) VALUES
+-- ('Gabriel Silva Martins',       '001.001.001-01', 'gabriel.martins@gmail.com',    'gabriel.martins@fatec.sp.gov.br',    '(14) 99101-0001', '2003-02-14', 'Rua Acre, 10',           'Ourinhos',    1),
+-- ('Isabela Rocha Ferreira',      '002.002.002-02', 'isabela.ferreira@gmail.com',   'isabela.ferreira@fatec.sp.gov.br',   '(14) 99102-0002', '2004-05-20', 'Rua Amazonas, 22',       'Ourinhos',    1),
+-- ('Thiago Alves Pereira',        '003.003.003-03', 'thiago.pereira@gmail.com',     'thiago.pereira@fatec.sp.gov.br',     '(14) 99103-0003', '2003-08-11', 'Rua Bahia, 33',          'Salto Grande',1),
+-- ('Larissa Cunha Dias',          '004.004.004-04', 'larissa.dias@gmail.com',       'larissa.dias@fatec.sp.gov.br',       '(14) 99104-0004', '2004-11-03', 'Rua Ceará, 44',          'Ourinhos',    1),
+-- ('Bruno Henrique Lopes',        '005.005.005-05', 'bruno.lopes@gmail.com',        'bruno.lopes@fatec.sp.gov.br',        '(14) 99105-0005', '2002-06-30', 'Rua Goiás, 55',          'Ourinhos',    1),
+-- ('Amanda Nunes Souza',          '006.006.006-06', 'amanda.souza@gmail.com',       'amanda.souza@fatec.sp.gov.br',       '(14) 99106-0006', '2003-01-17', 'Rua Minas Gerais, 66',   'Ribeirão do Sul',1),
+-- ('Felipe Torres Ribeiro',       '007.007.007-07', 'felipe.ribeiro@gmail.com',     'felipe.ribeiro@fatec.sp.gov.br',     '(14) 99107-0007', '2004-09-25', 'Rua Paraná, 77',         'Ourinhos',    1),
+-- ('Natalia Freitas Costa',       '008.008.008-08', 'natalia.costa@gmail.com',      'natalia.costa@fatec.sp.gov.br',      '(14) 99108-0008', '2003-04-08', 'Rua Piauí, 88',          'Ourinhos',    1),
+-- ('Lucas Barbosa Carvalho',      '009.009.009-09', 'lucas.carvalho@gmail.com',     'lucas.carvalho@fatec.sp.gov.br',     '(14) 99109-0009', '2002-12-19', 'Rua Rio Grande, 99',     'Canitar',     1),
+-- ('Mariana Vasconcelos Lima',    '010.010.010-10', 'mariana.lima@gmail.com',       'mariana.lima@fatec.sp.gov.br',       '(14) 99110-0010', '2004-03-07', 'Rua São Paulo, 110',     'Ourinhos',    1),
+-- ('Diego Nascimento Gomes',      '011.011.011-11', 'diego.gomes@gmail.com',        'diego.gomes@fatec.sp.gov.br',        '(14) 99111-0011', '2003-07-22', 'Rua Mato Grosso, 121',   'Chavantes',   1),
+-- ('Camila Pinto Azevedo',        '012.012.012-12', 'camila.azevedo@gmail.com',     'camila.azevedo@fatec.sp.gov.br',     '(14) 99112-0012', '2004-10-14', 'Rua Tocantins, 132',     'Ourinhos',    1),
+-- ('Rodrigo Figueiredo Santos',   '013.013.013-13', 'rodrigo.santos@gmail.com',     'rodrigo.santos@fatec.sp.gov.br',     '(14) 99113-0013', '2002-02-28', 'Rua Espírito Santo, 143','Ourinhos',    1),
+-- ('Letícia Moreira Castro',      '014.014.014-14', 'leticia.castro@gmail.com',     'leticia.castro@fatec.sp.gov.br',     '(14) 99114-0014', '2003-05-16', 'Rua Maranhão, 154',      'Salto Grande',1),
+-- ('Gustavo Ramos Teixeira',      '015.015.015-15', 'gustavo.teixeira@gmail.com',   'gustavo.teixeira@fatec.sp.gov.br',   '(14) 99115-0015', '2004-08-09', 'Rua Sergipe, 165',       'Ourinhos',    1);
+
+-- -- ── TURMA 2 — GESTÃO EMPRESARIAL ──────────────────────────
+-- INSERT INTO aluno (nome, cpf, email_pessoal, email_institucional, telefone, data_nasc, endereco, cidade, codturma) VALUES
+-- ('Beatriz Cavalcante Melo',     '016.016.016-16', 'beatriz.melo@gmail.com',       'beatriz.melo@fatec.sp.gov.br',       '(14) 99116-0016', '2002-03-11', 'Rua Pará, 176',          'Ourinhos',    2),
+-- ('Victor Araújo Brandão',       '017.017.017-17', 'victor.brandao@gmail.com',     'victor.brandao@fatec.sp.gov.br',     '(14) 99117-0017', '2003-06-04', 'Rua Alagoas, 187',       'Ourinhos',    2),
+-- ('Sophia Mendes Correia',       '018.018.018-18', 'sophia.correia@gmail.com',     'sophia.correia@fatec.sp.gov.br',     '(14) 99118-0018', '2004-01-29', 'Rua Rio de Janeiro, 198','Chavantes',   2),
+-- ('Matheus Oliveira Brito',      '019.019.019-19', 'matheus.brito@gmail.com',      'matheus.brito@fatec.sp.gov.br',      '(14) 99119-0019', '2002-09-17', 'Rua Roraima, 209',       'Ourinhos',    2),
+-- ('Bianca Souza Dantas',         '020.020.020-20', 'bianca.dantas@gmail.com',      'bianca.dantas@fatec.sp.gov.br',      '(14) 99120-0020', '2003-12-05', 'Rua Amapá, 220',         'Ourinhos',    2),
+-- ('Henrique Carvalho Monteiro',  '021.021.021-21', 'henrique.monteiro@gmail.com',  'henrique.monteiro@fatec.sp.gov.br',  '(14) 99121-0021', '2004-04-22', 'Rua Pernambuco, 231',    'Salto Grande',2),
+-- ('Aline Vieira Rodrigues',      '022.022.022-22', 'aline.rodrigues@gmail.com',    'aline.rodrigues@fatec.sp.gov.br',    '(14) 99122-0022', '2002-07-10', 'Rua Rondônia, 242',      'Ourinhos',    2),
+-- ('Rafael Borges Macedo',        '023.023.023-23', 'rafael.macedo@gmail.com',      'rafael.macedo@fatec.sp.gov.br',      '(14) 99123-0023', '2003-10-28', 'Rua Acre, 253',          'Ribeirão do Sul',2),
+-- ('Caroline Almeida Tavares',    '024.024.024-24', 'caroline.tavares@gmail.com',   'caroline.tavares@fatec.sp.gov.br',   '(14) 99124-0024', '2004-02-13', 'Rua Amazonas, 264',      'Ourinhos',    2),
+-- ('Eduardo Duarte Pacheco',      '025.025.025-25', 'eduardo.pacheco@gmail.com',    'eduardo.pacheco@fatec.sp.gov.br',    '(14) 99125-0025', '2002-05-01', 'Rua Bahia, 275',         'Ourinhos',    2),
+-- ('Priscila Andrade Campos',     '026.026.026-26', 'priscila.campos@gmail.com',    'priscila.campos@fatec.sp.gov.br',    '(14) 99126-0026', '2003-08-19', 'Rua Ceará, 286',         'Canitar',     2),
+-- ('Thales Fontes Queiroz',       '027.027.027-27', 'thales.queiroz@gmail.com',     'thales.queiroz@fatec.sp.gov.br',     '(14) 99127-0027', '2004-11-07', 'Rua Goiás, 297',         'Ourinhos',    2),
+-- ('Vanessa Leal Guimarães',      '028.028.028-28', 'vanessa.guimaraes@gmail.com',  'vanessa.guimaraes@fatec.sp.gov.br',  '(14) 99128-0028', '2002-01-25', 'Rua Paraíba, 308',       'Ourinhos',    2),
+-- ('Caio Augusto Prado',          '029.029.029-29', 'caio.prado@gmail.com',         'caio.prado@fatec.sp.gov.br',         '(14) 99129-0029', '2003-04-12', 'Rua Maranhão, 319',      'Chavantes',   2),
+-- ('Juliana Esteves Nogueira',    '030.030.030-30', 'juliana.nogueira@gmail.com',   'juliana.nogueira@fatec.sp.gov.br',   '(14) 99130-0030', '2004-07-01', 'Rua Piauí, 330',         'Ourinhos',    2);
+
+-- -- ── TURMA 3 — LOGÍSTICA ───────────────────────────────────
+-- INSERT INTO aluno (nome, cpf, email_pessoal, email_institucional, telefone, data_nasc, endereco, cidade, codturma) VALUES
+-- ('Pedro Henrique Abreu',        '031.031.031-31', 'pedro.abreu@gmail.com',        'pedro.abreu@fatec.sp.gov.br',        '(14) 99131-0031', '2003-03-20', 'Rua Tocantins, 341',     'Ourinhos',    3),
+-- ('Fernanda Lima Couto',         '032.032.032-32', 'fernanda.couto@gmail.com',     'fernanda.couto@fatec.sp.gov.br',     '(14) 99132-0032', '2004-06-08', 'Rua Espírito Santo, 352','Salto Grande',3),
+-- ('Igor Siqueira Braga',         '033.033.033-33', 'igor.braga@gmail.com',         'igor.braga@fatec.sp.gov.br',         '(14) 99133-0033', '2002-09-26', 'Rua Minas Gerais, 363',  'Ourinhos',    3),
+-- ('Thaís Moura Cavalcanti',      '034.034.034-34', 'thais.cavalcanti@gmail.com',   'thais.cavalcanti@fatec.sp.gov.br',   '(14) 99134-0034', '2003-12-14', 'Rua São Paulo, 374',     'Ourinhos',    3),
+-- ('Leandro Furtado Mesquita',    '035.035.035-35', 'leandro.mesquita@gmail.com',   'leandro.mesquita@fatec.sp.gov.br',   '(14) 99135-0035', '2004-03-02', 'Rua Mato Grosso, 385',   'Ourinhos',    3),
+-- ('Giovana Trindade Assis',      '036.036.036-36', 'giovana.assis@gmail.com',      'giovana.assis@fatec.sp.gov.br',      '(14) 99136-0036', '2002-06-21', 'Rua Pará, 396',          'Ribeirão do Sul',3),
+-- ('Samuel Rezende Paiva',        '037.037.037-37', 'samuel.paiva@gmail.com',       'samuel.paiva@fatec.sp.gov.br',       '(14) 99137-0037', '2003-09-09', 'Rua Alagoas, 407',       'Ourinhos',    3),
+-- ('Natasha Cordeiro Barros',     '038.038.038-38', 'natasha.barros@gmail.com',     'natasha.barros@fatec.sp.gov.br',     '(14) 99138-0038', '2004-12-28', 'Rua Rio de Janeiro, 418','Ourinhos',    3),
+-- ('Davi Lucena Carvalho',        '039.039.039-39', 'davi.carvalho@gmail.com',      'davi.carvalho@fatec.sp.gov.br',      '(14) 99139-0039', '2002-03-15', 'Rua Roraima, 429',       'Canitar',     3),
+-- ('Rebeca Soares Valente',       '040.040.040-40', 'rebeca.valente@gmail.com',     'rebeca.valente@fatec.sp.gov.br',     '(14) 99140-0040', '2003-06-03', 'Rua Amapá, 440',         'Ourinhos',    3),
+-- ('Arthur Menezes Cunha',        '041.041.041-41', 'arthur.cunha@gmail.com',       'arthur.cunha@fatec.sp.gov.br',       '(14) 99141-0041', '2004-08-22', 'Rua Pernambuco, 451',    'Ourinhos',    3),
+-- ('Vitória Salles Pacheco',      '042.042.042-42', 'vitoria.pacheco@gmail.com',    'vitoria.pacheco@fatec.sp.gov.br',    '(14) 99142-0042', '2002-11-10', 'Rua Sergipe, 462',       'Chavantes',   3),
+-- ('Murilo Vargas Pereira',       '043.043.043-43', 'murilo.pereira@gmail.com',     'murilo.pereira@fatec.sp.gov.br',     '(14) 99143-0043', '2003-02-27', 'Rua Paraíba, 473',       'Ourinhos',    3),
+-- ('Yasmin Flores Bastos',        '044.044.044-44', 'yasmin.bastos@gmail.com',      'yasmin.bastos@fatec.sp.gov.br',      '(14) 99144-0044', '2004-05-16', 'Rua Rondônia, 484',      'Ourinhos',    3),
+-- ('Carlos Eduardo Stein',        '045.045.045-45', 'carlos.stein@gmail.com',       'carlos.stein@fatec.sp.gov.br',       '(14) 99145-0045', '2002-08-04', 'Rua Acre, 495',          'Salto Grande',3);
+
+-- -- ── TURMA 4 — AGRONEGÓCIO ─────────────────────────────────
+-- INSERT INTO aluno (nome, cpf, email_pessoal, email_institucional, telefone, data_nasc, endereco, cidade, codturma) VALUES
+-- ('Anna Clara Bezerra Farias',   '046.046.046-46', 'anna.farias@gmail.com',        'anna.farias@fatec.sp.gov.br',        '(14) 99146-0046', '2003-01-12', 'Rua Amazonas, 506',      'Ourinhos',    4),
+-- ('Guilherme Estrada Mota',      '047.047.047-47', 'guilherme.mota@gmail.com',     'guilherme.mota@fatec.sp.gov.br',     '(14) 99147-0047', '2004-04-01', 'Rua Bahia, 517',         'Ourinhos',    4),
+-- ('Lara Vilaça Drummond',        '048.048.048-48', 'lara.drummond@gmail.com',      'lara.drummond@fatec.sp.gov.br',      '(14) 99148-0048', '2002-07-20', 'Rua Ceará, 528',         'Ribeirão do Sul',4),
+-- ('Renato Coelho Viana',         '049.049.049-49', 'renato.viana@gmail.com',       'renato.viana@fatec.sp.gov.br',       '(14) 99149-0049', '2003-10-08', '  Rua Goiás, 539',       'Ourinhos',    4),
+-- ('Débora Takahashi Nunes',      '050.050.050-50', 'debora.nunes@gmail.com',       'debora.nunes@fatec.sp.gov.br',       '(14) 99150-0050', '2004-01-27', 'Rua Paraná, 550',        'Ourinhos',    4),
+-- ('Otávio Fernandes Lacerda',    '051.051.051-51', 'otavio.lacerda@gmail.com',     'otavio.lacerda@fatec.sp.gov.br',     '(14) 99151-0051', '2002-04-14', 'Rua Piauí, 561',         'Canitar',     4),
+-- ('Milena Abreu Travassos',      '052.052.052-52', 'milena.travassos@gmail.com',   'milena.travassos@fatec.sp.gov.br',   '(14) 99152-0052', '2003-07-03', 'Rua Rio Grande, 572',    'Ourinhos',    4),
+-- ('Nicolas Sampaio Leite',       '053.053.053-53', 'nicolas.leite@gmail.com',      'nicolas.leite@fatec.sp.gov.br',      '(14) 99153-0053', '2004-09-21', 'Rua São Paulo, 583',     'Ourinhos',    4),
+-- ('Estefânia Borba Quintela',    '054.054.054-54', 'estefania.quintela@gmail.com', 'estefania.quintela@fatec.sp.gov.br', '(14) 99154-0054', '2002-12-10', 'Rua Mato Grosso, 594',   'Chavantes',   4),
+-- ('Patrick Mello Evangelista',   '055.055.055-55', 'patrick.evangelista@gmail.com','patrick.evangelista@fatec.sp.gov.br','(14) 99155-0055', '2003-03-29', 'Rua Tocantins, 605',     'Ourinhos',    4),
+-- ('Luana Cristina Peixoto',      '056.056.056-56', 'luana.peixoto@gmail.com',      'luana.peixoto@fatec.sp.gov.br',      '(14) 99156-0056', '2004-06-17', 'Rua Espírito Santo, 616','Ourinhos',    4),
+-- ('Flávio Zanetti Corrêa',       '057.057.057-57', 'flavio.correa@gmail.com',      'flavio.correa@fatec.sp.gov.br',      '(14) 99157-0057', '2002-09-05', 'Rua Minas Gerais, 627',  'Salto Grande',4),
+-- ('Sabrina Hollanda Maciel',     '058.058.058-58', 'sabrina.maciel@gmail.com',     'sabrina.maciel@fatec.sp.gov.br',     '(14) 99158-0058', '2003-11-24', 'Rua São Paulo, 638',     'Ourinhos',    4),
+-- ('Yuri Coutinho Fonseca',       '059.059.059-59', 'yuri.fonseca@gmail.com',       'yuri.fonseca@fatec.sp.gov.br',       '(14) 99159-0059', '2004-02-11', 'Rua Paraíba, 649',       'Ourinhos',    4),
+-- ('Nathalia Girão Vasconcelos',  '060.060.060-60', 'nathalia.vasconcelos@gmail.com','nathalia.vasconcelos@fatec.sp.gov.br','(14) 99160-0060','2002-05-01', 'Rua Maranhão, 660',      'Ribeirão do Sul',4);
+
+-- -- ── TURMA 5 — PRODUÇÃO SUCROALCOOLEIRA ────────────────────
+-- INSERT INTO aluno (nome, cpf, email_pessoal, email_institucional, telefone, data_nasc, endereco, cidade, codturma) VALUES
+-- ('Augusto Cézar Rocha Filho',   '061.061.061-61', 'augusto.filho@gmail.com',      'augusto.filho@fatec.sp.gov.br',      '(14) 99161-0061', '2003-01-18', 'Rua Pará, 671',          'Ourinhos',    5),
+-- ('Tamires Lopes Wanderley',     '062.062.062-62', 'tamires.wanderley@gmail.com',  'tamires.wanderley@fatec.sp.gov.br',  '(14) 99162-0062', '2004-04-07', 'Rua Alagoas, 682',       'Ourinhos',    5),
+-- ('Josué Pedrosa Meireles',      '063.063.063-63', 'josue.meireles@gmail.com',     'josue.meireles@fatec.sp.gov.br',     '(14) 99163-0063', '2002-07-26', 'Rua Rio de Janeiro, 693','Canitar',     5),
+-- ('Brenda Tavares Cerqueira',    '064.064.064-64', 'brenda.cerqueira@gmail.com',   'brenda.cerqueira@fatec.sp.gov.br',   '(14) 99164-0064', '2003-10-13', 'Rua Roraima, 704',       'Ourinhos',    5),
+-- ('Fábio Augusto Prates',        '065.065.065-65', 'fabio.prates@gmail.com',       'fabio.prates@fatec.sp.gov.br',       '(14) 99165-0065', '2004-01-02', 'Rua Amapá, 715',         'Ourinhos',    5),
+-- ('Monique Silveira Lemos',      '066.066.066-66', 'monique.lemos@gmail.com',      'monique.lemos@fatec.sp.gov.br',      '(14) 99166-0066', '2002-03-22', 'Rua Pernambuco, 726',    'Chavantes',   5),
+-- ('Wendel Bastos Alcântara',     '067.067.067-67', 'wendel.alcantara@gmail.com',   'wendel.alcantara@fatec.sp.gov.br',   '(14) 99167-0067', '2003-06-10', 'Rua Sergipe, 737',       'Ourinhos',    5),
+-- ('Cristiane Souza Pasqual',     '068.068.068-68', 'cristiane.pasqual@gmail.com',  'cristiane.pasqual@fatec.sp.gov.br',  '(14) 99168-0068', '2004-08-29', 'Rua Paraíba, 748',       'Salto Grande',5),
+-- ('Tiago Lins Cavalcante',       '069.069.069-69', 'tiago.cavalcante@gmail.com',   'tiago.cavalcante@fatec.sp.gov.br',   '(14) 99169-0069', '2002-11-17', 'Rua Rondônia, 759',      'Ourinhos',    5),
+-- ('Helena Macedo Paes',          '070.070.070-70', 'helena.paes@gmail.com',        'helena.paes@fatec.sp.gov.br',        '(14) 99170-0070', '2003-02-05', 'Rua Acre, 770',          'Ourinhos',    5),
+-- ('Danilo Queiroz Ribeiro',      '071.071.071-71', 'danilo.ribeiro@gmail.com',     'danilo.ribeiro@fatec.sp.gov.br',     '(14) 99171-0071', '2004-04-24', 'Rua Amazonas, 781',      'Ourinhos',    5),
+-- ('Érica Fonseca Stela',         '072.072.072-72', 'erica.stela@gmail.com',        'erica.stela@fatec.sp.gov.br',        '(14) 99172-0072', '2002-07-13', 'Rua Bahia, 792',         'Ribeirão do Sul',5),
+-- ('Wesley Santos Carneiro',      '073.073.073-73', 'wesley.carneiro@gmail.com',    'wesley.carneiro@fatec.sp.gov.br',    '(14) 99173-0073', '2003-10-01', 'Rua Ceará, 803',         'Ourinhos',    5),
+-- ('Paloma Andrade Novaes',       '074.074.074-74', 'paloma.novaes@gmail.com',      'paloma.novaes@fatec.sp.gov.br',      '(14) 99174-0074', '2004-12-20', 'Rua Goiás, 814',         'Ourinhos',    5),
+-- ('Elias Mendonça Portela',      '075.075.075-75', 'elias.portela@gmail.com',      'elias.portela@fatec.sp.gov.br',      '(14) 99175-0075', '2002-03-09', 'Rua Paraná, 825',        'Canitar',     5);
+
+-- -- ── VERIFICAÇÃO ───────────────────────────────────────────
+-- SELECT 'Professores' AS tabela, COUNT(*) AS total FROM professor
+-- UNION ALL SELECT 'Cursos',      COUNT(*) FROM curso
+-- UNION ALL SELECT 'Disciplinas', COUNT(*) FROM disciplina
+-- UNION ALL SELECT 'Turmas',      COUNT(*) FROM turma
+-- UNION ALL SELECT 'Alunos',      COUNT(*) FROM aluno;
+
+
