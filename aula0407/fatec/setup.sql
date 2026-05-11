@@ -72,6 +72,28 @@ CREATE TABLE IF NOT EXISTS aluno (
     FOREIGN KEY (codturma) REFERENCES turma(codturma) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ================================================
+-- FATEC — Tabela de Matrícula
+-- Execute após o setup.sql
+-- ================================================
+
+USE fatec;
+
+CREATE TABLE IF NOT EXISTS matricula (
+    codmatricula  INT PRIMARY KEY AUTO_INCREMENT,
+    ra            INT NOT NULL,                          -- aluno
+    coddisc       INT NOT NULL,                          -- disciplina
+    codturma      INT NOT NULL,                          -- turma do aluno
+    data_matricula DATE NOT NULL DEFAULT (CURRENT_DATE),
+    status        ENUM('Ativa','Trancada','Concluída') NOT NULL DEFAULT 'Ativa',
+    nota          DECIMAL(4,2) DEFAULT NULL,             -- 0.00 a 10.00, null = não lançada
+    FOREIGN KEY (ra)       REFERENCES aluno(ra)          ON DELETE CASCADE,
+    FOREIGN KEY (coddisc)  REFERENCES disciplina(coddisc) ON DELETE CASCADE,
+    FOREIGN KEY (codturma) REFERENCES turma(codturma)    ON DELETE CASCADE,
+    -- impede matrícula duplicada do mesmo aluno na mesma disciplina/turma
+    UNIQUE KEY uq_matricula (ra, coddisc, codturma)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ── DADOS DE EXEMPLO (opcional) ───────────────────────────
 INSERT INTO professor (nome,data_nasc,cpf,email_pessoal,email_institucional,telefone,endereco,cidade) VALUES
 ('Ana Paula Souza','1980-03-15','123.456.789-00','ana@gmail.com','ana@fatec.sp.gov.br','(11) 99111-2222','Rua das Flores, 100','São Paulo'),

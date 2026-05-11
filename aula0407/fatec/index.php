@@ -229,7 +229,7 @@
   .btn-danger:hover { background:#e04e4e; }
 
   /* STATS CARDS */
-  .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
   .stat-card {
     background:var(--surface); border:1px solid var(--border); border-radius:12px;
     padding:20px 24px; display:flex; align-items:center; gap:16px;
@@ -245,6 +245,61 @@
     .form-grid { grid-template-columns:1fr; }
     .stats-grid { grid-template-columns:1fr; }
   }
+
+  /* MATRÍCULA — painel de resumo */
+  .mat-layout { display:grid; grid-template-columns:320px 1fr; gap:24px; align-items:start; }
+  .aluno-picker {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    position:sticky; top:24px;
+  }
+  .aluno-picker-header {
+    padding:16px 20px; border-bottom:1px solid var(--border);
+    font-size:12px; font-weight:700; letter-spacing:1px; color:var(--muted);
+    font-family:var(--mono); text-transform:uppercase;
+  }
+  .aluno-picker-search {
+    padding:12px 16px; border-bottom:1px solid var(--border);
+  }
+  .aluno-list { max-height:480px; overflow-y:auto; }
+  .aluno-list-item {
+    padding:12px 20px; cursor:pointer; transition:background 0.1s;
+    border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:2px;
+  }
+  .aluno-list-item:last-child { border-bottom:none; }
+  .aluno-list-item:hover { background:var(--surface2); }
+  .aluno-list-item.selected { background:rgba(79,142,247,0.1); border-left:3px solid var(--accent); }
+  .aluno-list-item .ali-nome { font-size:13px; font-weight:700; }
+  .aluno-list-item .ali-info { font-size:11px; color:var(--muted); font-family:var(--mono); }
+
+  .mat-detail { display:flex; flex-direction:column; gap:16px; }
+  .mat-empty {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:60px 20px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px;
+  }
+  .mat-aluno-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px 24px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .mac-left { display:flex; flex-direction:column; gap:4px; }
+  .mac-nome { font-size:18px; font-weight:800; }
+  .mac-meta { font-size:12px; color:var(--muted); font-family:var(--mono); }
+  .mac-stats { display:flex; gap:16px; }
+  .mac-stat { text-align:center; }
+  .mac-stat-val { font-size:20px; font-weight:800; }
+  .mac-stat-lbl { font-size:10px; color:var(--muted); font-family:var(--mono); letter-spacing:1px; }
+
+  .mat-status-ativa    { background:rgba(62,207,142,0.15); color:var(--green); }
+  .mat-status-trancada { background:rgba(247,200,79,0.15); color:var(--yellow); }
+  .mat-status-concluida{ background:rgba(79,142,247,0.15); color:var(--accent); }
+
+  .nota-badge {
+    display:inline-block; padding:2px 10px; border-radius:20px;
+    font-size:11px; font-weight:700; font-family:var(--mono);
+  }
+  .nota-ok  { background:rgba(62,207,142,0.15); color:var(--green); }
+  .nota-med { background:rgba(247,200,79,0.15); color:var(--yellow); }
+  .nota-rep { background:rgba(247,95,95,0.15); color:var(--red); }
+  .nota-nd  { background:var(--surface2); color:var(--muted); }
 </style>
 </head>
 <body>
@@ -284,6 +339,9 @@
       <div class="nav-label">Vínculos</div>
       <div class="nav-item" onclick="loadPage('item_disc_curso')">
         <span class="nav-icon">🔗</span> Disc. ↔ Curso
+      </div>
+      <div class="nav-item" onclick="loadPage('matriculas')">
+        <span class="nav-icon">📋</span> Matrículas
       </div>
     </div>
   </nav>
@@ -342,6 +400,7 @@ function loadPage(page) {
     disciplinas: () => renderCRUD('disciplinas'),
     turmas: () => renderCRUD('turmas'),
     item_disc_curso: () => renderCRUD('item_disc_curso'),
+    matriculas: renderMatriculas,
   };
   if(pages[page]) pages[page]();
 }
@@ -351,12 +410,12 @@ async function renderDashboard() {
   const main = document.getElementById('main-content');
   main.innerHTML = '<div class="loading">Carregando dashboard...</div>';
   
-  const tables = ['alunos','professores','cursos','disciplinas','turmas'];
+  const tables = ['alunos','professores','cursos','disciplinas','turmas','matriculas'];
   const counts = await Promise.all(tables.map(t => apiFetch('list', t, {}, 'count')));
   
-  const icons = ['👤','🎓','📚','📖','🏫'];
-  const labels = ['Alunos','Professores','Cursos','Disciplinas','Turmas'];
-  const colors = ['accent','green','accent2','yellow','accent'];
+  const icons = ['👤','🎓','📚','📖','🏫','📋'];
+  const labels = ['Alunos','Professores','Cursos','Disciplinas','Turmas','Matrículas'];
+  const colors = ['accent','green','accent2','yellow','accent','green'];
   
   main.innerHTML = `
     <div class="page-header">
@@ -434,6 +493,19 @@ const CONFIG = {
     renderRow: r => [r.coditem, r.disc_nome, r.curso_nome],
     pkCol: 'coditem',
     form: formItemDiscCurso,
+  },
+  matriculas: {
+    title: 'Matrículas', label: 'Matrícula',
+    cols: ['codmatricula','aluno_nome','disc_nome','turma_nome','data_matricula','status','nota'],
+    headers: ['Cód','Aluno','Disciplina','Turma','Data','Status','Nota'],
+    renderRow: r => [
+      r.codmatricula, r.aluno_nome, r.disc_nome,
+      tag(r.turma_nome,'blue'), fmtDate(r.data_matricula),
+      `<span class="tag mat-status-${r.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}">${r.status}</span>`,
+      notaBadge(r.nota)
+    ],
+    pkCol: 'codmatricula',
+    form: formMatricula,
   },
 };
 
@@ -519,6 +591,255 @@ function openCreateModal(table) {
 function openEditModal(table, data) {
   const cfg = CONFIG[table];
   cfg.form(data, table);
+}
+
+// ─── MATRÍCULAS — PÁGINA ESPECIAL ─────────────────────────
+let todosAlunos = [];
+let alunoSelecionado = null;
+
+async function renderMatriculas() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">
+        <h2>Matrículas</h2>
+        <p>fatec / matriculas</p>
+      </div>
+      <button class="btn-primary" onclick="openNovaMatricula()">+ Nova Matrícula</button>
+    </div>
+    <div class="mat-layout">
+      <div class="aluno-picker">
+        <div class="aluno-picker-header">Selecionar Aluno</div>
+        <div class="aluno-picker-search">
+          <input class="search-box" style="width:100%" placeholder="Buscar aluno..." oninput="filtrarAlunos(this.value)" id="aluno-search">
+        </div>
+        <div class="aluno-list" id="aluno-list">
+          <div class="loading">Carregando...</div>
+        </div>
+      </div>
+      <div class="mat-detail" id="mat-detail">
+        <div class="mat-empty">
+          <div style="font-size:48px;margin-bottom:16px;opacity:0.3">📋</div>
+          <p>Selecione um aluno para ver suas matrículas.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  todosAlunos = await apiFetch('list', 'alunos');
+  renderListaAlunos(todosAlunos);
+}
+
+function filtrarAlunos(q) {
+  const filtrados = todosAlunos.filter(a => a.nome.toLowerCase().includes(q.toLowerCase()));
+  renderListaAlunos(filtrados);
+}
+
+function renderListaAlunos(lista) {
+  const el = document.getElementById('aluno-list');
+  if (!lista.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:12px">Nenhum aluno encontrado.</div>';
+    return;
+  }
+  el.innerHTML = lista.map(a => `
+    <div class="aluno-list-item ${alunoSelecionado?.ra==a.ra?'selected':''}" onclick="selecionarAluno(${a.ra})">
+      <span class="ali-nome">${a.nome}</span>
+      <span class="ali-info">RA ${a.ra} · ${a.turma_nome||'Sem turma'}</span>
+    </div>
+  `).join('');
+}
+
+async function selecionarAluno(ra) {
+  alunoSelecionado = todosAlunos.find(a => a.ra == ra);
+  // atualiza seleção visual
+  document.querySelectorAll('.aluno-list-item').forEach(el => el.classList.remove('selected'));
+  event?.currentTarget?.classList.add('selected');
+  // re-renderiza a lista para destacar
+  const q = document.getElementById('aluno-search')?.value || '';
+  filtrarAlunos(q);
+
+  const detail = document.getElementById('mat-detail');
+  detail.innerHTML = '<div class="loading">Carregando matrículas...</div>';
+
+  const mats = await apiFetch('resumo_aluno', 'matriculas', {ra});
+
+  const ativas    = mats.filter(m => m.status === 'Ativa').length;
+  const concluidas= mats.filter(m => m.status === 'Concluída').length;
+  const trancadas = mats.filter(m => m.status === 'Trancada').length;
+  const chTotal   = mats.reduce((s,m) => s + parseInt(m.carga_horaria||0), 0);
+
+  detail.innerHTML = `
+    <div class="mat-aluno-card">
+      <div class="mac-left">
+        <div class="mac-nome">${alunoSelecionado.nome}</div>
+        <div class="mac-meta">RA ${alunoSelecionado.ra} · ${alunoSelecionado.turma_nome||'Sem turma'} · ${alunoSelecionado.cidade}</div>
+      </div>
+      <div class="mac-stats">
+        <div class="mac-stat">
+          <div class="mac-stat-val" style="color:var(--green)">${ativas}</div>
+          <div class="mac-stat-lbl">ATIVAS</div>
+        </div>
+        <div class="mac-stat">
+          <div class="mac-stat-val" style="color:var(--accent)">${concluidas}</div>
+          <div class="mac-stat-lbl">CONCLUÍDAS</div>
+        </div>
+        <div class="mac-stat">
+          <div class="mac-stat-val" style="color:var(--yellow)">${trancadas}</div>
+          <div class="mac-stat-lbl">TRANCADAS</div>
+        </div>
+        <div class="mac-stat">
+          <div class="mac-stat-val">${chTotal}h</div>
+          <div class="mac-stat-lbl">CARGA HOR.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span style="font-size:12px;font-family:var(--mono);color:var(--muted)">DISCIPLINAS MATRICULADAS</span>
+        <span class="count-badge" style="margin-left:auto">${mats.length} matrículas</span>
+      </div>
+      ${mats.length === 0
+        ? `<div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma matrícula encontrada.</p></div>`
+        : `<table>
+            <thead><tr>
+              <th>Disciplina</th><th>Turma</th><th>Curso</th>
+              <th>Data</th><th>Status</th><th>Nota</th><th>Ações</th>
+            </tr></thead>
+            <tbody>
+              ${mats.map(m => `
+                <tr>
+                  <td class="name-cell">${m.disc_nome}</td>
+                  <td>${m.turma_nome}</td>
+                  <td>${m.curso_nome}</td>
+                  <td style="font-family:var(--mono)">${fmtDate(m.data_matricula)}</td>
+                  <td><span class="tag mat-status-${m.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}">${m.status}</span></td>
+                  <td>${notaBadge(m.nota)}</td>
+                  <td><div class="actions">
+                    <button class="btn-edit" onclick='editarMatricula(${JSON.stringify(m)})'>Editar</button>
+                    <button class="btn-del"  onclick='confirmDelete("matriculas",${m.codmatricula},"${m.disc_nome}")'>Excluir</button>
+                  </div></td>
+                </tr>`).join('')}
+            </tbody>
+          </table>`
+      }
+    </div>
+  `;
+}
+
+async function openNovaMatricula() {
+  alunoSelecionado
+    ? formMatricula(null, 'matriculas', alunoSelecionado)
+    : formMatricula(null, 'matriculas', null);
+}
+
+async function editarMatricula(data) {
+  formMatricula(data, 'matriculas', alunoSelecionado);
+}
+
+async function formMatricula(data, table, alunoPresel) {
+  const alunos = await apiFetch('list', 'alunos');
+
+  // monta select de alunos
+  const raPresel = data?.ra || alunoPresel?.ra || '';
+  const alunoOpts = alunos.map(a => `<option value="${a.ra}" ${a.ra==raPresel?'selected':''}>${a.nome} (RA ${a.ra})</option>`).join('');
+
+  // pega turma do aluno pré-selecionado para já buscar disciplinas
+  const alunoRef = data ? alunos.find(a=>a.ra==data.ra) : alunoPresel;
+  const turmaRef = alunoRef?.codturma || '';
+  const raRef    = alunoRef?.ra || '';
+
+  let discOpts = '<option value="">— selecione o aluno primeiro —</option>';
+  if (turmaRef && raRef) {
+    const discs = await apiFetch('discs_by_turma', 'matriculas', {codturma: turmaRef, ra: data?0:raRef});
+    if (data) {
+      // no edit, inclui a disciplina atual
+      discOpts = `<option value="${data.coddisc}" selected>${data.disc_nome}</option>`;
+    } else {
+      discOpts = discs.length
+        ? discs.map(d=>`<option value="${d.coddisc}">${d.nome}</option>`).join('')
+        : '<option value="">Sem disciplinas disponíveis</option>';
+    }
+  }
+
+  const bodyHTML = `
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Aluno</label>
+        <select name="ra" id="f_ra" onchange="onChangeAlunoMatricula(this.value)" ${data?'disabled':''}>
+          <option value="">Selecione</option>${alunoOpts}
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Disciplina</label>
+        <select name="coddisc" id="f_coddisc" ${data?'disabled':''}>
+          ${discOpts}
+        </select>
+      </div>
+      <input type="hidden" name="codturma" id="f_codturma" value="${turmaRef}">
+      <div class="form-group">
+        <label>Data da Matrícula</label>
+        <input type="date" name="data_matricula" id="f_data_matricula" value="${data?.data_matricula || new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status" id="f_status">
+          ${['Ativa','Trancada','Concluída'].map(s=>`<option value="${s}" ${data?.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nota (0 a 10)</label>
+        <input type="number" name="nota" id="f_nota" min="0" max="10" step="0.1" value="${data?.nota??''}" placeholder="Não lançada">
+      </div>
+    </div>
+  `;
+
+  const pk = data?.codmatricula || '';
+  openModal(data ? 'Editar Matrícula' : 'Nova Matrícula', bodyHTML, `
+    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    <button class="btn-primary" onclick="saveMatricula('${pk}')">${data?'Salvar':'Matricular'}</button>
+  `);
+}
+
+async function onChangeAlunoMatricula(ra) {
+  if (!ra) return;
+  const alunos = await apiFetch('list', 'alunos');
+  const aluno  = alunos.find(a => a.ra == ra);
+  if (!aluno?.codturma) return;
+
+  document.getElementById('f_codturma').value = aluno.codturma;
+  const discs = await apiFetch('discs_by_turma', 'matriculas', {codturma: aluno.codturma, ra});
+  const sel = document.getElementById('f_coddisc');
+  sel.innerHTML = discs.length
+    ? discs.map(d=>`<option value="${d.coddisc}">${d.nome}</option>`).join('')
+    : '<option value="">Sem disciplinas disponíveis</option>';
+}
+
+async function saveMatricula(pk) {
+  const payload = {
+    ra:             document.getElementById('f_ra')?.value || '',
+    coddisc:        document.getElementById('f_coddisc')?.value || '',
+    codturma:       document.getElementById('f_codturma')?.value || '',
+    data_matricula: document.getElementById('f_data_matricula')?.value || '',
+    status:         document.getElementById('f_status')?.value || 'Ativa',
+    nota:           document.getElementById('f_nota')?.value || null,
+    pk, pkCol: 'codmatricula',
+  };
+
+  if (!payload.ra || !payload.coddisc || !payload.codturma) {
+    showAlert('Preencha aluno e disciplina.', 'error'); return;
+  }
+
+  const action = pk ? 'update' : 'create';
+  const res = await apiFetch(action, 'matriculas', payload);
+
+  if (res.success) {
+    closeModal();
+    showAlert(pk ? 'Matrícula atualizada!' : 'Matrícula realizada!', 'success');
+    if (alunoSelecionado) selecionarAluno(alunoSelecionado.ra);
+  } else {
+    const msg = res.error?.includes('Duplicate') ? 'Aluno já matriculado nessa disciplina!' : (res.error || 'Falha na operação');
+    showAlert('Erro: ' + msg, 'error');
+  }
 }
 
 // ─── FORM BUILDERS ────────────────────────────────────────
@@ -646,7 +967,11 @@ function confirmDelete(table, pk, name) {
     closeConfirm();
     if(res.success) {
       showAlert('Registro excluído.', 'success');
-      loadTable(table);
+      if (table === 'matriculas' && alunoSelecionado) {
+        selecionarAluno(alunoSelecionado.ra);
+      } else {
+        loadTable(table);
+      }
     } else {
       showAlert('Erro ao excluir: ' + (res.error||''), 'error');
     }
@@ -670,6 +995,12 @@ async function apiFetch(action, table, payload={}, mode='') {
 }
 
 // ─── UTILS ────────────────────────────────────────────────
+function notaBadge(nota) {
+  if (nota === null || nota === undefined || nota === '') return `<span class="nota-badge nota-nd">—</span>`;
+  const n = parseFloat(nota);
+  const cls = n >= 7 ? 'nota-ok' : n >= 5 ? 'nota-med' : 'nota-rep';
+  return `<span class="nota-badge ${cls}">${n.toFixed(1)}</span>`;
+}
 function tag(text, color) {
   return `<span class="tag tag-${color}">${text}</span>`;
 }

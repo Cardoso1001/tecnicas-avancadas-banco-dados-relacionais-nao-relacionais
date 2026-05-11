@@ -48,6 +48,19 @@ $list_queries = [
         JOIN curso c ON c.codcurso = i.codcurso
         ORDER BY c.nome, d.nome
     ",
+    'matriculas' => "
+        SELECT m.*,
+               a.nome  AS aluno_nome,
+               d.nome  AS disc_nome,
+               t.nome  AS turma_nome,
+               c.nome  AS curso_nome
+        FROM matricula m
+        JOIN aluno      a ON a.ra       = m.ra
+        JOIN disciplina d ON d.coddisc  = m.coddisc
+        JOIN turma      t ON t.codturma = m.codturma
+        JOIN curso      c ON c.codcurso = t.codcurso
+        ORDER BY a.nome, d.nome
+    ",
 ];
 
 $pk_map = [
@@ -57,6 +70,7 @@ $pk_map = [
     'disciplinas'    => 'coddisc',
     'turmas'         => 'codturma',
     'item_disc_curso'=> 'coditem',
+    'matriculas'     => 'codmatricula',
 ];
 
 $table_map = [
@@ -66,6 +80,7 @@ $table_map = [
     'disciplinas'    => 'disciplina',
     'turmas'         => 'turma',
     'item_disc_curso'=> 'item_disc_curso',
+    'matriculas'     => 'matricula',
 ];
 
 $allowed = array_keys($pk_map);
@@ -82,7 +97,69 @@ $fields_map = [
     'disciplinas'    => ['nome','carga_horaria','codprof'],
     'turmas'         => ['nome','codcurso'],
     'item_disc_curso'=> ['coddisc','codcurso'],
+    'matriculas'     => ['ra','coddisc','codturma','data_matricula','status','nota'],
 ];
+
+// ─── ROTA ESPECIAL: disciplinas disponíveis por turma ─────
+// Retorna disciplinas do curso da turma que o aluno ainda não está matriculado
+if ($action === 'discs_by_turma') {
+    $codturma = intval($body['codturma'] ?? 0);
+    $ra       = intval($body['ra']       ?? 0);
+    if (!$codturma) { echo json_encode([]); exit; }
+
+    $sql = "
+        SELECT d.coddisc, d.nome
+        FROM disciplina d
+        JOIN item_disc_curso idc ON idc.coddisc = d.coddisc
+        JOIN turma t ON t.codcurso = idc.codcurso
+        WHERE t.codturma = ?
+    ";
+    // Excluir disciplinas já matriculadas pelo aluno nessa turma
+    if ($ra) {
+        $sql .= " AND d.coddisc NOT IN (
+            SELECT coddisc FROM matricula WHERE ra = ? AND codturma = ?
+        )";
+    }
+    $sql .= " ORDER BY d.nome";
+
+    $stmt = $conn->prepare($sql);
+    if ($ra) {
+        $stmt->bind_param('iii', $codturma, $ra, $codturma);
+    } else {
+        $stmt->bind_param('i', $codturma);
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $rows = [];
+    while ($row = $res->fetch_assoc()) $rows[] = $row;
+    echo json_encode($rows);
+    exit;
+}
+
+// ─── ROTA ESPECIAL: resumo de matrícula por aluno ─────────
+if ($action === 'resumo_aluno') {
+    $ra = intval($body['ra'] ?? 0);
+    if (!$ra) { echo json_encode([]); exit; }
+
+    $stmt = $conn->prepare("
+        SELECT m.codmatricula, m.data_matricula, m.status, m.nota,
+               d.nome AS disc_nome, d.carga_horaria,
+               t.nome AS turma_nome, c.nome AS curso_nome
+        FROM matricula m
+        JOIN disciplina d ON d.coddisc  = m.coddisc
+        JOIN turma      t ON t.codturma = m.codturma
+        JOIN curso      c ON c.codcurso = t.codcurso
+        WHERE m.ra = ?
+        ORDER BY m.status, d.nome
+    ");
+    $stmt->bind_param('i', $ra);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $rows = [];
+    while ($row = $res->fetch_assoc()) $rows[] = $row;
+    echo json_encode($rows);
+    exit;
+}
 
 // ─── LIST ─────────────────────────────────────────────────
 if ($action === 'list') {
